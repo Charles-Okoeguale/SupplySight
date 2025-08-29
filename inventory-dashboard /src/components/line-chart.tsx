@@ -1,4 +1,4 @@
-import { CartesianGrid, Line, LineChart, XAxis } from "recharts"
+import { CartesianGrid, Legend, Line, LineChart, XAxis } from "recharts"
 import {
   ChartConfig,
   ChartContainer,
@@ -87,6 +87,7 @@ export function ChartLineMultiple({ chartData, dateRange }: ChartLineMultiplePro
               dot={true}
               activeDot={{ r: 6 }}
             />
+            <Legend verticalAlign="top" align="right" />
           </LineChart>
         </ChartContainer>
       </CardContent>

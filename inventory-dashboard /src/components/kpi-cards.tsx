@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { ChartLineMultiple } from './line-chart';
 import ProductsTable from './products-table';
 
@@ -62,14 +62,44 @@ const calculateKpis = (products: Product[] | undefined) => {
 
 const KpiDashboard = ({ products, timeSeries, dateRange }: KpiDashboardProps) => {
   const { totalStock, totalDemand, fillRate } = calculateKpis(products);
-  console.log(products, "products")
-  console.log(timeSeries, "timeSeries")
 
   const chartData = timeSeries?.map((item: KpiObject) => ({
     date: item.date,
     stock: item.stock,
     demand: item.demand,
   }));
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedWarehouse, setSelectedWarehouse] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
+
+  const filteredProducts = useMemo(() => {
+    return products?.filter((p) => {
+      if (searchTerm) {
+        const lower = searchTerm.toLowerCase();
+        const matches =
+          p.id.toLowerCase().startsWith(lower) ||
+          p.name.toLowerCase().startsWith(lower) ||
+          p.sku.toLowerCase().startsWith(lower);
+        if (!matches) return false;
+      }
+
+      if (selectedWarehouse && selectedWarehouse !== "Warehouses") {
+        if (p.warehouse !== selectedWarehouse) return false;
+      }
+
+      if (selectedStatus && selectedStatus !== "Status") {
+        let status: "Healthy" | "Low" | "Critical";
+        if (p.stock >= p.demand) status = "Healthy";
+        else if (p.stock > 0) status = "Low";
+        else status = "Critical";
+
+        if (status !== selectedStatus) return false;
+      }
+
+      return true;
+    });
+  }, [products, searchTerm, selectedWarehouse, selectedStatus]);
 
   return (
     <div className="p-4">
@@ -80,16 +110,20 @@ const KpiDashboard = ({ products, timeSeries, dateRange }: KpiDashboardProps) =>
       </div>
 
       <div className="mt-8 w-[65%] mx-auto">
-        <ChartLineMultiple chartData={chartData} dateRange={dateRange}/>
+        <ChartLineMultiple chartData={chartData} dateRange={dateRange} />
       </div>
 
       <div className="mt-8 flex flex-col justify-around md:flex-row md:items-center md:space-x-4 space-y-4 md:space-y-0">
         <input
           type="text"
           placeholder="Search by name, SKU, ID"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
           className="text-black border border-gray-300 rounded-lg px-3 py-2 w-full md:w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
         />
         <select
+          value={selectedWarehouse}
+          onChange={(e) => setSelectedWarehouse(e.target.value)}
           className="text-black border border-gray-300 rounded-lg px-3 py-2 w-full md:w-1/4 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
         >
           <option>Warehouses</option>
@@ -98,6 +132,8 @@ const KpiDashboard = ({ products, timeSeries, dateRange }: KpiDashboardProps) =>
           <option>Warehouse C</option>
         </select>
         <select
+          value={selectedStatus}
+          onChange={(e) => setSelectedStatus(e.target.value)}
           className="text-black border border-gray-300 rounded-lg px-3 py-2 w-full md:w-1/4 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
         >
           <option>Status</option>
@@ -105,10 +141,21 @@ const KpiDashboard = ({ products, timeSeries, dateRange }: KpiDashboardProps) =>
           <option>Low</option>
           <option>Critical</option>
         </select>
+
+        <button
+          onClick={() => {
+            setSearchTerm("");
+            setSelectedWarehouse("");
+            setSelectedStatus("");
+          }}
+          className="bg-gray-200 hover:bg-gray-300 text-black font-medium rounded-lg px-4 py-2 transition"
+        >
+          Reset filters
+        </button>
       </div>
 
       <div className="mt-8">
-        <ProductsTable products={products} />
+        <ProductsTable products={filteredProducts} />
       </div>
     </div>
   );

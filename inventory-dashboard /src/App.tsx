@@ -53,13 +53,11 @@ interface KpiQueryResponse {
 }
 
 function App() {
-
   const [dateRange, setDateRange] = React.useState('7d');
-
+  
   const { data: kpiData, loading: kpiLoading, error: kpiError } = useQuery<KpiQueryResponse>(GET_KPIS_QUERY, {
     variables: { range: dateRange },
   });
-
   const { data: productData, loading: productsLoading, error: productsError } = useQuery<ProductQueryResponse>(GET_PRODUCTS_QUERY);
 
   const ranges = [

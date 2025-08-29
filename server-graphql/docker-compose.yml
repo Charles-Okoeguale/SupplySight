@@ -1,0 +1,8 @@
+services:
+  mongo:
+    image: mongo:6.0
+    container_name: products-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./data/db:/data/db

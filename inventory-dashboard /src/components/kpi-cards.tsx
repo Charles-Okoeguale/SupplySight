@@ -88,11 +88,14 @@ const KpiDashboard = ({ products, timeSeries, dateRange }: KpiDashboardProps) =>
         if (p.warehouse !== selectedWarehouse) return false;
       }
 
+      const stock = Number(p.stock);
+      const demand = Number(p.demand);
+
       if (selectedStatus && selectedStatus !== "Status") {
         let status: "Healthy" | "Low" | "Critical";
-        if (p.stock >= p.demand) status = "Healthy";
-        else if (p.stock > 0) status = "Low";
-        else status = "Critical";
+        if (stock > demand) status = "Healthy";    
+        else if (stock === demand) status = "Low";    
+        else status = "Critical"; 
 
         if (status !== selectedStatus) return false;
       }

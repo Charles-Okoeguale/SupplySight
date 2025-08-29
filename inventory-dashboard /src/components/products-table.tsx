@@ -1,8 +1,7 @@
-"use client"
-
 import React, { useState } from 'react';
 import { gql } from '@apollo/client';
 import { useMutation } from '@apollo/client/react';
+import { toast } from "sonner"
 
 import {
   Drawer,
@@ -53,26 +52,34 @@ const TRANSFER_STOCK_MUTATION = gql`
 const ProductsTable: React.FC<ProductsTableProps> = ({ products }) => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  const [updateDemand, { loading: demandLoading }] = useMutation(UPDATE_DEMAND_MUTATION);
+  const [updateDemand, { loading: demandLoading }] = useMutation(UPDATE_DEMAND_MUTATION, {
+    refetchQueries: ["Products"],
+  });
   const [transferStock, { loading: transferLoading }] = useMutation(TRANSFER_STOCK_MUTATION);
 
   const [newDemand, setNewDemand] = useState<number>(0);
   const [transferQty, setTransferQty] = useState<number>(0);
   const [toWarehouse, setToWarehouse] = useState<string>('');
 
-  const handleUpdateDemand = async () => {
-    if (selectedProduct) {
-      await updateDemand({ variables: { id: selectedProduct.id, demand: newDemand } });
-      // You would typically re-fetch queries here to update the UI
-    }
-  };
+    const handleUpdateDemand = async () => {
+        if (!selectedProduct) return;
+        try {
+            await updateDemand({
+                variables: { id: selectedProduct.id, demand: newDemand },
+            });
+            toast.success("Demand updated successfully!")
+            setSelectedProduct(null)
+        } catch (err) {
+            console.error(err);
+            alert("error updating demand")
+        }
+    };
 
-  const handleTransferStock = async () => {
-    if (selectedProduct) {
-      await transferStock({ variables: { id: selectedProduct.id, from: selectedProduct.warehouse, to: toWarehouse, qty: transferQty } });
-      // You would typically re-fetch queries here to update the UI
-    }
-  };
+    const handleTransferStock = async () => {
+        if (selectedProduct) {
+            await transferStock({ variables: { id: selectedProduct.id, from: selectedProduct.warehouse, to: toWarehouse, qty: transferQty } });
+        }
+    };
 
   return (
     <div className="overflow-x-auto rounded-lg shadow-md border">

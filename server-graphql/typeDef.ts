@@ -10,6 +10,11 @@ export const typeDefs = gql`
     demand: Int!
   }
 
+  type TransferResult {
+    success: Boolean!
+    message: String!
+  }
+
   type KPI {
     date: String!
     stock: Int!
@@ -23,6 +28,6 @@ export const typeDefs = gql`
 
   type Mutation {
     updateDemand(id: ID!, demand: Int!): Product!
-    transferStock(id: ID!, from: String!, to: String!, qty: Int!): Product!
+    transferStock(id: ID!, from: String!, to: String!, qty: Int!): TransferResult!
   }
 `;

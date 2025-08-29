@@ -1,6 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { ChartLineMultiple } from './line-chart';
 import ProductsTable from './products-table';
+import Dropdown from './dropdown';
+import { getWarehouses } from '@/utils';
 
 interface KpiCardProps {
   label: string;
@@ -116,7 +118,7 @@ const KpiDashboard = ({ products, timeSeries, dateRange }: KpiDashboardProps) =>
         <ChartLineMultiple chartData={chartData} dateRange={dateRange} />
       </div>
 
-      <div className="mt-8 flex flex-col justify-around md:flex-row md:items-center md:space-x-4 space-y-4 md:space-y-0">
+      <div className="mt-8 flex flex-col md:flex-row md:items-center md:space-x-4 space-y-4 md:space-y-0">
         <input
           type="text"
           placeholder="Search by name, SKU, ID"
@@ -124,27 +126,18 @@ const KpiDashboard = ({ products, timeSeries, dateRange }: KpiDashboardProps) =>
           onChange={(e) => setSearchTerm(e.target.value)}
           className="text-black border border-gray-300 rounded-lg px-3 py-2 w-full md:w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
         />
-        <select
+        <Dropdown
           value={selectedWarehouse}
-          onChange={(e) => setSelectedWarehouse(e.target.value)}
-          className="text-black border border-gray-300 rounded-lg px-3 py-2 w-full md:w-1/4 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-        >
-          <option>Warehouses</option>
-          <option>Warehouse A</option>
-          <option>Warehouse B</option>
-          <option>Warehouse C</option>
-        </select>
-        <select
+          onChange={setSelectedWarehouse}
+          options={getWarehouses(products)}
+          placeholder="Select Warehouse"
+        />
+        <Dropdown
           value={selectedStatus}
-          onChange={(e) => setSelectedStatus(e.target.value)}
-          className="text-black border border-gray-300 rounded-lg px-3 py-2 w-full md:w-1/4 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-        >
-          <option>Status</option>
-          <option>Healthy</option>
-          <option>Low</option>
-          <option>Critical</option>
-        </select>
-
+          onChange={setSelectedStatus}
+          options={["Healthy", "Low", "Critical"]}
+          placeholder="Select Status"
+        />
         <button
           onClick={() => {
             setSearchTerm("");

@@ -29,13 +29,39 @@ export const resolvers = {
         { demand },
         { new: true }
       );
-    }
-    // transferStock: async (_: any, { id, from, to, qty }: any) => {
-    //   const product = await ProductModel.findById(id);
-    //   if (!product) throw new Error("Product not found");
+    },
+    
+    transferStock: async (_: any, { id, from, to, qty }: any) => {
+   
+        const product : any = await ProductModel.findOne({ id });
+        
+        if (!product) throw new Error("Product not found");
+        if (product.warehouse !== from) throw new Error("Product not in source warehouse");
+        if (product.stock < qty) throw new Error("Not enough stock to transfer");
 
-    //   product.stock = ProductModel.stock - qty;
-    //   return await product.save();
-    // }
+        product.stock -= qty;
+
+        let targetProduct = await ProductModel.findOne({ sku: product.sku, warehouse: to });
+        if (!targetProduct) {
+            targetProduct = new ProductModel({
+                id: `${product.id}-${to}`, 
+                name: product.name,
+                sku: product.sku,
+                warehouse: to,
+                stock: qty,
+                demand: product.demand,
+            });
+        } else {
+            targetProduct.stock += qty;
+        }
+
+        await product.save();
+        await targetProduct.save();
+
+        return {
+            success: true,
+            message: "Stock transferred successfully",
+        };
+}
   }
 };

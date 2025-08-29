@@ -16,6 +16,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import Dropdown from './dropdown';
+import { getWarehouses } from '@/utils';
 
 interface Product {
   id: string;
@@ -30,6 +32,13 @@ interface ProductsTableProps {
   products: Product[] | undefined;
 }
 
+interface TransferStockResult {
+  transferStock: {
+    success: boolean;
+    message?: string;
+  };
+}
+
 const UPDATE_DEMAND_MUTATION = gql`
   mutation UpdateDemand($id: ID!, $demand: Int!) {
     updateDemand(id: $id, demand: $demand) {
@@ -42,20 +51,18 @@ const UPDATE_DEMAND_MUTATION = gql`
 const TRANSFER_STOCK_MUTATION = gql`
   mutation TransferStock($id: ID!, $from: String!, $to: String!, $qty: Int!) {
     transferStock(id: $id, from: $from, to: $to, qty: $qty) {
-      id
-      stock
-      warehouse
+      success
+      message
     }
   }
 `;
 
 const ProductsTable: React.FC<ProductsTableProps> = ({ products }) => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-
   const [updateDemand, { loading: demandLoading }] = useMutation(UPDATE_DEMAND_MUTATION, {
     refetchQueries: ["Products"],
   });
-  const [transferStock, { loading: transferLoading }] = useMutation(TRANSFER_STOCK_MUTATION);
+  const [transferStock, { loading: transferLoading }] = useMutation<TransferStockResult>(TRANSFER_STOCK_MUTATION);
 
   const [newDemand, setNewDemand] = useState<number>(0);
   const [transferQty, setTransferQty] = useState<number>(0);
@@ -76,8 +83,28 @@ const ProductsTable: React.FC<ProductsTableProps> = ({ products }) => {
     };
 
     const handleTransferStock = async () => {
-        if (selectedProduct) {
-            await transferStock({ variables: { id: selectedProduct.id, from: selectedProduct.warehouse, to: toWarehouse, qty: transferQty } });
+        if (!selectedProduct) return;
+
+        try {
+            const { data } = await transferStock({
+            variables: {
+                id: selectedProduct.id,
+                from: selectedProduct.warehouse,
+                to: toWarehouse,
+                qty: transferQty,
+            },
+            refetchQueries: ["Products"],
+            });
+
+            if (data?.transferStock.success) {
+                toast.success(data.transferStock.message);
+                setSelectedProduct(null);
+            } else {
+                toast.error(data?.transferStock.message || "Transfer failed");
+            }
+        } catch (err) {
+            console.error(err);
+            toast.error("Error transferring stock");
         }
     };
 
@@ -213,13 +240,14 @@ const ProductsTable: React.FC<ProductsTableProps> = ({ products }) => {
                     value={transferQty}
                     onChange={(e) => setTransferQty(Number(e.target.value))}
                   />
-                  <Label htmlFor="to-warehouse">To Warehouse:</Label>
-                  <Input
-                    id="to-warehouse"
-                    type="text"
+                  <Label htmlFor="to-warehouse">To:</Label>
+                  
+                <Dropdown
                     value={toWarehouse}
-                    onChange={(e) => setToWarehouse(e.target.value)}
-                  />
+                    onChange={setToWarehouse}
+                    options={getWarehouses(products)}
+                    placeholder="Select Warehouse"
+                />
                 </div>
                 <Button
                   onClick={handleTransferStock}

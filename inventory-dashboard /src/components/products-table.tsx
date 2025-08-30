@@ -3,7 +3,7 @@ import { gql } from '@apollo/client';
 import { useMutation } from '@apollo/client/react';
 import { toast } from "sonner"
 import { LoadingSpinner } from './ui/loading-spinner';
-import { Package, Edit, ArrowRightLeft, AlertTriangle, X } from 'lucide-react';
+import { Package, Edit, ArrowRightLeft, AlertTriangle, X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 import {
   Drawer,
@@ -53,6 +53,19 @@ const ProductsTable: React.FC<ProductsTableProps> = ({ products, isLoading }) =>
   const [newDemand, setNewDemand] = useState<number>(0);
   const [transferQty, setTransferQty] = useState<number>(0);
   const [toWarehouse, setToWarehouse] = useState<string>('');
+
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const itemsPerPage = 10;
+
+  const totalItems = products?.length || 0;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentProducts = products?.slice(startIndex, endIndex);
+
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [products]);
 
     const handleUpdateDemand = async () => {
         if (!selectedProduct) return;
@@ -174,7 +187,7 @@ const ProductsTable: React.FC<ProductsTableProps> = ({ products, isLoading }) =>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {products?.map((product) => {
+            {currentProducts?.map((product) => {
               const isHealthy = product.stock > product.demand;
               const isLow = product.stock === product.demand;
               const isCritical = product.stock < product.demand;
@@ -249,7 +262,6 @@ const ProductsTable: React.FC<ProductsTableProps> = ({ products, isLoading }) =>
 
         {selectedProduct && (
           <DrawerContent className="bg-white text-black max-w-md mx-auto">
-            {/* Close Button - Top Right */}
             <div className="absolute top-4 right-4 z-10">
               <DrawerClose asChild>
                 <Button 
@@ -386,9 +398,71 @@ const ProductsTable: React.FC<ProductsTableProps> = ({ products, isLoading }) =>
               </div>
             </div>
 
-                      </DrawerContent>
+            </DrawerContent>
         )}
       </Drawer>
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between px-6 py-4 bg-white border-t border-gray-200">
+          <div className="flex items-center text-sm text-gray-700">
+            <span>
+              Showing {startIndex + 1} to {Math.min(endIndex, totalItems)} of {totalItems} results
+            </span>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="flex items-center space-x-1 bg-blue-400"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              <span>Previous</span>
+            </Button>
+            
+            <div className="flex items-center space-x-1">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                const showPage = 
+                  page === 1 || 
+                  page === totalPages || 
+                  (page >= currentPage - 1 && page <= currentPage + 1);
+                
+                if (!showPage) {
+                  if (page === currentPage - 2 || page === currentPage + 2) {
+                    return <span key={page} className="px-2 text-gray-400">...</span>;
+                  }
+                  return null;
+                }
+                
+                return (
+                  <Button
+                    key={page}
+                    variant={currentPage === page ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setCurrentPage(page)}
+                    className="w-8 h-8 p-0 bg-blue-400"
+                  >
+                    {page}
+                  </Button>
+                );
+              })}
+            </div>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="flex items-center space-x-1 bg-blue-400"
+            >
+              <span>Next</span>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

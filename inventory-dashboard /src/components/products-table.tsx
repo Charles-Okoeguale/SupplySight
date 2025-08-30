@@ -3,7 +3,7 @@ import { gql } from '@apollo/client';
 import { useMutation } from '@apollo/client/react';
 import { toast } from "sonner"
 import { LoadingSpinner } from './ui/loading-spinner';
-import { Package, Edit, ArrowRightLeft, AlertTriangle } from 'lucide-react';
+import { Package, Edit, ArrowRightLeft, AlertTriangle, X } from 'lucide-react';
 
 import {
   Drawer,
@@ -266,8 +266,22 @@ const ProductsTable: React.FC<ProductsTableProps> = ({ products, isLoading }) =>
 
         {selectedProduct && (
           <DrawerContent className="bg-white text-black max-w-md mx-auto">
-            <div className="p-6">
-              <DrawerHeader className="px-0">
+            {/* Close Button - Top Right */}
+            <div className="absolute top-4 right-4 z-10">
+              <DrawerClose asChild>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className="h-8 w-8 p-0 rounded-full hover:bg-gray-100"
+                >
+                  <X className="h-4 w-4" />
+                  <span className="sr-only">Close</span>
+                </Button>
+              </DrawerClose>
+            </div>
+
+            <div className="p-6 pb-8">
+              <DrawerHeader className="px-0 pr-8">
                 <div className="flex items-center space-x-3 mb-2">
                   <div className="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center">
                     <Package className="h-5 w-5 text-blue-600" />
@@ -279,7 +293,6 @@ const ProductsTable: React.FC<ProductsTableProps> = ({ products, isLoading }) =>
                 </div>
               </DrawerHeader>
 
-              {/* Product Details */}
               <div className="bg-gray-50 rounded-lg p-4 mb-6">
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
@@ -301,7 +314,6 @@ const ProductsTable: React.FC<ProductsTableProps> = ({ products, isLoading }) =>
                 </div>
               </div>
 
-              {/* Update Demand Section */}
               <div className="mb-6">
                 <div className="flex items-center space-x-2 mb-3">
                   <Edit className="h-4 w-4 text-gray-600" />
@@ -340,7 +352,6 @@ const ProductsTable: React.FC<ProductsTableProps> = ({ products, isLoading }) =>
                 </div>
               </div>
 
-              {/* Transfer Stock Section */}
               <div className="mb-6">
                 <div className="flex items-center space-x-2 mb-3">
                   <ArrowRightLeft className="h-4 w-4 text-gray-600" />
@@ -392,12 +403,7 @@ const ProductsTable: React.FC<ProductsTableProps> = ({ products, isLoading }) =>
               </div>
             </div>
 
-            <DrawerFooter className="border-t border-gray-200">
-              <DrawerClose asChild>
-                <Button variant="outline" className="w-full">Close</Button>
-              </DrawerClose>
-            </DrawerFooter>
-          </DrawerContent>
+                      </DrawerContent>
         )}
       </Drawer>
     </div>

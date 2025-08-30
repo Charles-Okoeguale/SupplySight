@@ -16,15 +16,13 @@ const TopBar = ({dateRange, setDateRange, ranges} : TopBarProps) => {
     <div className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo and Title */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-1">
             <div className="flex items-center justify-center w-8 h-8 bg-blue-600 rounded-lg">
               <BarChart3 className="w-5 h-5 text-white" />
             </div>
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">SupplySight</h1>
+            <h1 className="text-sm sm:text-xl font-bold text-gray-900">SupplySight</h1>
           </div>
           
-          {/* Date Range Selector */}
           <div className="flex items-center space-x-1 bg-gray-100 rounded-lg p-1">
             {ranges.map((range) => (
               <button

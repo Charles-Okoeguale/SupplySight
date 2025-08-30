@@ -76,7 +76,6 @@ function App() {
     refetchProducts();
   };
 
-  // Show loading state for initial load
   if ((kpiLoading || productsLoading) && !kpiData && !productData) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -86,7 +85,6 @@ function App() {
     );
   }
 
-  // Show error state if both queries failed
   if ((kpiError && productsError) && !kpiData && !productData) {
     return (
       <div className="min-h-screen bg-gray-50">

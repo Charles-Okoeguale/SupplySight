@@ -20,16 +20,39 @@ interface ChartLineMultipleProps {
 }
 
 const formatDate = (date: string, range: string, index: number) => {
+   const isSmallScreen = typeof window !== 'undefined' && window.innerWidth < 768;
+  let interval = 0;
+  let dataPoints = 0;
+
   switch (range) {
     case '7d':
       return format(new Date(date), 'MMM d');
     case '14d':
-      return index % 2 === 0 ? format(new Date(date), 'MMM d') : '';
+      interval = 2;
+      dataPoints = 14;
+      break;
     case '30d':
-      return index % 5 === 0 ? format(new Date(date), 'MMM d') : '';
+      if (isSmallScreen) {
+        interval = 1;
+        dataPoints = 5;
+      } else {
+        interval = 4;
+        dataPoints = 30;
+      }
+      break;
     default:
       return date;
   }
+
+  if (index === dataPoints - 1) {
+    return format(new Date(date), 'MMM d');
+  }
+
+  if (index % interval === 0) {
+    return format(new Date(date), 'MMM d');
+  }
+
+  return '';
 };
 
 
@@ -77,6 +100,8 @@ export function ChartLineMultiple({ chartData, dateRange, isLoading }: ChartLine
                 axisLine={false}
                 tickMargin={8}
                 textAnchor="end"
+                padding={{ left: 30, right: 30 }} 
+                minTickGap={3}
                 tickFormatter={(value, index) => formatDate(value, dateRange, index)} 
                 className="text-gray-600"
               />

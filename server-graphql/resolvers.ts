@@ -32,19 +32,26 @@ export const resolvers = {
     },
     
     transferStock: async (_: any, { id, from, to, qty }: any) => {
-   
-        const product : any = await ProductModel.findOne({ id });
+        const product: any = await ProductModel.findOne({ id });   
+        if (!product) {
+            throw new Error("Product not found");
+        }
         
-        if (!product) throw new Error("Product not found");
-        if (product.warehouse !== from) throw new Error("Product not in source warehouse");
-        if (product.stock < qty) throw new Error("Not enough stock to transfer");
+        if (product.warehouse !== from) {
+            throw new Error("Product not in source warehouse");
+        }
+        
+        if (product.stock < qty) {
+            throw new Error("Not enough stock to transfer");
+        }
 
         product.stock -= qty;
+        await product.save();
 
         let targetProduct = await ProductModel.findOne({ sku: product.sku, warehouse: to });
         if (!targetProduct) {
             targetProduct = new ProductModel({
-                id: `${product.id}-${to}`, 
+                id: `${product.sku}-${to}`, 
                 name: product.name,
                 sku: product.sku,
                 warehouse: to,
@@ -54,14 +61,8 @@ export const resolvers = {
         } else {
             targetProduct.stock += qty;
         }
-
-        await product.save();
         await targetProduct.save();
-
-        return {
-            success: true,
-            message: "Stock transferred successfully",
-        };
-}
+        return product;
+    }
   }
 };

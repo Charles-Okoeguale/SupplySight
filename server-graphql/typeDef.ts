@@ -28,6 +28,6 @@ export const typeDefs = gql`
 
   type Mutation {
     updateDemand(id: ID!, demand: Int!): Product!
-    transferStock(id: ID!, from: String!, to: String!, qty: Int!): TransferResult!
+    transferStock(id: ID!, from: String!, to: String!, qty: Int!): Product!
   }
 `;

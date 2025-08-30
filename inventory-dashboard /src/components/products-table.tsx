@@ -86,6 +86,11 @@ const ProductsTable: React.FC<ProductsTableProps> = ({ products }) => {
         if (!selectedProduct) return;
 
         try {
+            console.log({id: selectedProduct.id,
+                from: selectedProduct.warehouse,
+                to: toWarehouse,
+                qty: transferQty
+            })
             const { data } = await transferStock({
             variables: {
                 id: selectedProduct.id,

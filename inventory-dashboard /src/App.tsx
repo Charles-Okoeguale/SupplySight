@@ -1,6 +1,8 @@
 import React from 'react'
 import TopBar from './components/top-bar'
 import KpiDashboard from './components/kpi-cards'
+import { LoadingState } from './components/ui/loading-spinner'
+import { ErrorState } from './components/ui/error-state'
 import { gql } from '@apollo/client';
 import { useQuery } from '@apollo/client/react';
 
@@ -40,7 +42,6 @@ interface ProductQueryResponse {
   products: Product[];
 }
 
-
 interface KpiObject {
   __typename: 'KPI';
   date: string;
@@ -55,10 +56,14 @@ interface KpiQueryResponse {
 function App() {
   const [dateRange, setDateRange] = React.useState('7d');
   
-  const { data: kpiData, loading: kpiLoading, error: kpiError } = useQuery<KpiQueryResponse>(GET_KPIS_QUERY, {
+  const { data: kpiData, loading: kpiLoading, error: kpiError, refetch: refetchKpis } = useQuery<KpiQueryResponse>(GET_KPIS_QUERY, {
     variables: { range: dateRange },
+    errorPolicy: 'all'
   });
-  const { data: productData, loading: productsLoading, error: productsError } = useQuery<ProductQueryResponse>(GET_PRODUCTS_QUERY);
+  
+  const { data: productData, loading: productsLoading, error: productsError, refetch: refetchProducts } = useQuery<ProductQueryResponse>(GET_PRODUCTS_QUERY, {
+    errorPolicy: 'all'
+  });
 
   const ranges = [
     { label: '7d', value: '7d' },
@@ -66,13 +71,48 @@ function App() {
     { label: '30d', value: '30d' },
   ];
 
-  if (kpiLoading || productsLoading) return <p>Loading...</p>;
-  if (kpiError || productsError) return <p>Error : {kpiError?.message || productsError?.message}</p>;
+  const handleRetry = () => {
+    refetchKpis();
+    refetchProducts();
+  };
+
+  // Show loading state for initial load
+  if ((kpiLoading || productsLoading) && !kpiData && !productData) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <TopBar setDateRange={setDateRange} ranges={ranges} dateRange={dateRange} />
+        <LoadingState message="Loading dashboard data..." className="min-h-[60vh]" />
+      </div>
+    );
+  }
+
+  // Show error state if both queries failed
+  if ((kpiError && productsError) && !kpiData && !productData) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <TopBar setDateRange={setDateRange} ranges={ranges} dateRange={dateRange} />
+        <ErrorState 
+          title="Failed to load dashboard"
+          message={kpiError?.message || productsError?.message || "Unable to fetch dashboard data. Please try again."}
+          onRetry={handleRetry}
+          className="min-h-[60vh]"
+        />
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <TopBar setDateRange={setDateRange} ranges={ranges} dateRange={dateRange}/>
-      <KpiDashboard products={productData?.products} timeSeries={kpiData?.kpis} dateRange={dateRange}/>
+    <div className="min-h-screen bg-gray-50">
+      <TopBar setDateRange={setDateRange} ranges={ranges} dateRange={dateRange} />
+      <KpiDashboard 
+        products={productData?.products} 
+        timeSeries={kpiData?.kpis} 
+        dateRange={dateRange}
+        isLoadingKpis={kpiLoading}
+        isLoadingProducts={productsLoading}
+        kpiError={kpiError}
+        productsError={productsError}
+      />
     </div>
   )
 }

@@ -64,7 +64,7 @@ The dashboard will open at `http://localhost:5173`
 
 ```
 SupplySight/
-├── server-graphql/          # Backend GraphQL API
+├── server-graphql/      
 │   ├── models/             # Database schemas
 │   ├── resolvers.ts        # GraphQL resolvers
 │   ├── typeDef.ts         # GraphQL schema
@@ -120,43 +120,6 @@ SupplySight/
 - **Lazy loading**: Components load when needed
 - **Efficient queries**: Only fetch required data
 - **Caching**: Apollo Client caches for faster subsequent loads
-
-## What I'd Improve With More Time
-
-### Features
-- **User authentication** and role-based permissions
-- **Real-time updates** using GraphQL subscriptions
-- **Bulk operations** (update multiple products at once)
-- **Advanced filtering** (date ranges, custom queries)
-- **Export functionality** (CSV, PDF reports)
-- **Inventory alerts** (email/SMS when stock is low)
-- **Audit trail** (track who changed what and when)
-- **Forecasting** (predict future demand based on trends)
-
-### Technical Improvements
-- **Database optimization**: Indexes, query optimization
-- **API rate limiting** and security hardening  
-- **Comprehensive testing** (unit, integration, e2e)
-- **CI/CD pipeline** for automated deployments
-- **Error monitoring** (Sentry, logging)
-- **Performance monitoring** (metrics, alerts)
-- **Database migrations** for schema changes
-- **API versioning** for backward compatibility
-
-### Code Quality
-- **Better TypeScript types** (stricter, more specific)
-- **Code splitting** for smaller bundle sizes
-- **Accessibility improvements** (ARIA labels, keyboard navigation)
-- **Internationalization** (multiple languages)
-- **Better error boundaries** and fallback UIs
-- **Performance profiling** and optimization
-
-### Infrastructure
-- **Production deployment** setup (Docker, Kubernetes)
-- **Environment configuration** (dev, staging, prod)
-- **Database backups** and disaster recovery
-- **CDN** for static assets
-- **Load balancing** for high availability
 
 ## Common Issues
 

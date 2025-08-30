@@ -11,7 +11,7 @@
 - Forecasting (predict future demand based on trends)
 
 
-## Descisions
+## Decisions
 I used 
 TypeScript to build the application, which improved code quality and made development easier. TypeScript's static typing helped prevent common bugs and made the codebase more robust and maintainable.
 Instead of a simple mock API, I chose to use 

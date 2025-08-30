@@ -56,9 +56,9 @@ The dashboard will open at `http://localhost:5173`
 3. **Product Table**: Browse all products with search and filtering
 4. **Product Actions**: Click any product row to update demand or transfer stock
 5. **Status Colors**: 
-   - 🟢 Green = Healthy (stock > demand)
-   - 🟡 Yellow = Low (stock = demand)  
-   - 🔴 Red = Critical (stock < demand)
+   - Green = Healthy (stock > demand)
+   - Yellow = Low (stock = demand)  
+   - Red = Critical (stock < demand)
 
 ## Project Structure
 

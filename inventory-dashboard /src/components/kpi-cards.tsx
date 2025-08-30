@@ -6,39 +6,7 @@ import { LoadingSpinner } from './ui/loading-spinner';
 import { ErrorState } from './ui/error-state';
 import { getWarehouses } from '@/utils';
 import { Package, TrendingUp, Target, Search, RotateCcw } from 'lucide-react';
-
-interface KpiCardProps {
-  label: string;
-  value: string | number;
-  icon: React.ReactNode;
-  isLoading?: boolean;
-}
-
-interface Product {
-  id: string;
-  name: string;
-  sku: string;
-  warehouse: string;
-  stock: number;
-  demand: number;
-}
-
-interface KpiObject {
-  __typename: 'KPI';
-  date: string;
-  stock: number;
-  demand: number;
-}
-
-interface KpiDashboardProps {
-  products: Product[] | undefined;
-  timeSeries: KpiObject[] | undefined;
-  dateRange: string;
-  isLoadingKpis?: boolean;
-  isLoadingProducts?: boolean;
-  kpiError?: unknown;
-  productsError?: unknown;
-}
+import { KpiCardProps, KpiDashboardProps, KpiObject, Product } from '@/lib/types';
 
 const KpiCard: React.FC<KpiCardProps> = ({ label, value, icon, isLoading }) => {
   return (

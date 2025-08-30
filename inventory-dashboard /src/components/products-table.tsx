@@ -10,7 +10,6 @@ import {
   DrawerClose,
   DrawerContent,
   DrawerDescription,
-  DrawerFooter,
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
@@ -20,27 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Dropdown from './dropdown';
 import { getWarehouses } from '@/utils';
-
-interface Product {
-  id: string;
-  name: string;
-  sku: string;
-  warehouse: string;
-  stock: number;
-  demand: number;
-}
-
-interface ProductsTableProps {
-  products: Product[] | undefined;
-  isLoading?: boolean;
-}
-
-interface TransferStockResult {
-  transferStock: {
-    success: boolean;
-    message?: string;
-  };
-}
+import { Product, ProductsTableProps, TransferStockResult } from '@/lib/types';
 
 const UPDATE_DEMAND_MUTATION = gql`
   mutation UpdateDemand($id: ID!, $demand: Int!) {
@@ -54,8 +33,12 @@ const UPDATE_DEMAND_MUTATION = gql`
 const TRANSFER_STOCK_MUTATION = gql`
   mutation TransferStock($id: ID!, $from: String!, $to: String!, $qty: Int!) {
     transferStock(id: $id, from: $from, to: $to, qty: $qty) {
-      success
-      message
+      id
+      name
+      sku
+      warehouse
+      stock
+      demand
     }
   }
 `;
@@ -103,14 +86,14 @@ const ProductsTable: React.FC<ProductsTableProps> = ({ products, isLoading }) =>
             refetchQueries: ["GetProducts"],
             });
 
-            if (data?.transferStock.success) {
+            if (data?.transferStock) {
                 toast.success("Stock transferred successfully!", {
                   description: `Transferred ${transferQty} units from ${selectedProduct.warehouse} to ${toWarehouse}`
                 });
                 setSelectedProduct(null);
             } else {
                 toast.error("Transfer failed", {
-                  description: data?.transferStock.message || "Unknown error occurred"
+                  description: "No product returned from transfer"
                 });
             }
         } catch (err) {

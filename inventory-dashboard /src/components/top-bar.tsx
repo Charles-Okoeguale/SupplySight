@@ -1,15 +1,5 @@
+import { TopBarProps } from "@/lib/types";
 import { BarChart3 } from "lucide-react";
-
-interface RangeOption {
-  label: string;
-  value: string;
-}
-
-interface TopBarProps {
-  dateRange: string;
-  setDateRange: (range: string) => void;
-  ranges: RangeOption[];
-}
 
 const TopBar = ({dateRange, setDateRange, ranges} : TopBarProps) => {
   return (
